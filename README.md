@@ -31,7 +31,7 @@ A minimal HTTP server built from scratch using Node.js with support for dynamic 
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/http-server.git
+git clone https://github.com/UlisesChoco/http-server.git
 
 # Enter the directory
 cd http-server
