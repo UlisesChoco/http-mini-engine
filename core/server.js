@@ -25,7 +25,7 @@ const populate_response = (response) => {
 
     const buffer = Buffer.from(response.body, 'utf-8');
 
-    response.http_headers = 'HTTP/1.1 200 OK\r\nContent-Length: '+buffer.length+'\r\nContent-Type: text/html\r\n\r\n';
+    response.http_headers = 'HTTP/1.1 200 OK\r\nContent-Length: '+buffer.length+'\r\nContent-Type: text/html; charset=utf-8\r\n\r\n';
 }
 
 const populate_404_response = (response) => {
