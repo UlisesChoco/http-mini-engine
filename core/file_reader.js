@@ -53,4 +53,11 @@ const load_html = (response, file_path, variables) => {
     response.body = html;
 };
 
+const load_static = (response, file_path) => {
+    let css = fs.readFileSync('../resources/'+file_path, 'utf-8');
+
+    response.body = css;
+}
+
 exports.load_html = load_html;
+exports.load_static = load_static;
