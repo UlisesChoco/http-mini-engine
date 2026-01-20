@@ -40,7 +40,7 @@ const start = (port, controller) => {
     const net_server = Net.createServer((client) => {
         server_log('Connection received from '+client.remoteAddress+':'+client.remotePort);
 
-        client.on('data', (data) => {
+        client.on('data', async (data) => {
             const request = {};
             const response = {};
 
@@ -56,7 +56,7 @@ const start = (port, controller) => {
                     populate_404_response(response);
                 } else {
                     const { route, handler } = controller.GET.get(request.route);
-                    handler(request, response);
+                    await handler(request, response);
                     populate_response(response);
                 }
             }
