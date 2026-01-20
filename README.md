@@ -24,7 +24,8 @@ A minimal HTTP server built from scratch using Node.js with support for dynamic 
 - **Native TCP server**: Built with `node:net`, no external dependencies
 - **HTTP parsing**: Support for GET requests
 - **Routing system**: Register handlers through a controller
-- **Template engine**: Load HTML files with `${variable}` substitution
+- **Async handlers**: Controllers support asynchronous functions with Promise-based execution
+- **Template engine**: Load HTML files with nested object property substitution (`${data.user.name}`)
 - **404 responses**: Automatic handling of unknown routes
 
 ## Installation
@@ -67,14 +68,23 @@ const { load_html } = require('../../core/file_reader');
 
 ### 2. Define routes
 
+Handlers support async/await for asynchronous operations:
+
 ```javascript
-controller.get('/', (request, response) => {
+controller.get('/', async (request, response) => {
+    const userData = await fetchUserData(); // Example async operation
+    
     load_html(
         response,
         'my-page.html',
         [
-            { key: 'title', value: 'My Title' },
-            { key: 'message', value: 'Hello World!' }
+            { key: 'data', value: JSON.stringify({
+                title: 'My Title',
+                user: {
+                    fullName: userData.name,
+                    email: userData.email
+                }
+            })}
         ]
     );
 });
@@ -82,10 +92,13 @@ controller.get('/', (request, response) => {
 
 ### 3. Create HTML template
 
+Access nested object properties using dot notation:
+
 ```html
 <!-- resources/my-page.html -->
-<h1>${title}</h1>
-<p>${message}</p>
+<h1>${data.title}</h1>
+<p>Welcome, ${data.user.fullName}</p>
+<p>Email: ${data.user.email}</p>
 ```
 
 ### 4. Start the server
@@ -105,21 +118,32 @@ Starts the HTTP server on the specified port.
 | `controller` | object | Controller instance with registered routes |
 
 ### `controller.get(route, handler)`
-Registers a GET route.
+Registers a GET route. Supports async handlers.
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `route` | string | Route to register (e.g., `/`, `/users`) |
-| `handler` | function | Function `(request, response) => {}` |
+| `handler` | function | Function `(request, response) => {}` or `async (request, response) => {}` |
 
 ### `load_html(response, file_path, variables)`
-Loads an HTML file and substitutes variables.
+Loads an HTML file and substitutes variables. Supports nested object properties.
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `response` | object | Response object from the handler |
 | `file_path` | string | Relative path to the HTML file from `/resources` |
-| `variables` | array | Array of `{ key, value }` objects to substitute in the HTML |
+| `variables` | array | Array of `{ key, value }` objects where `value` is a JSON stringified object |
+
+**Variable substitution example:**
+
+```javascript
+// In controller
+{ key: 'user', value: JSON.stringify({ name: 'John', address: { city: 'NYC' } }) }
+
+// In HTML template
+<p>${user.name}</p>           // Output: John
+<p>${user.address.city}</p>   // Output: NYC
+```
 
 ## Request and Response Objects
 
