@@ -1,40 +1,39 @@
 const fs = require('node:fs');
 
-const serch_variable_value = (html, data, index, lastIndex) => {
-    const fullKey = html.substring(index+2, lastIndex);
-    const keyParts = fullKey.split('.');
-    let dataCopy = data;
-    for(let i = 0 ; i < keyParts.length; i++) {
+const serch_variable_value = (html, data, index, last_index) => {
+    const full_key = html.substring(index+2, last_index);
+    const key_parts = full_key.split('.');
+    let data_copy = data;
+    for(let i = 0 ; i < key_parts.length; i++) {
         if(i === 0) {
             continue;
         }
-        dataCopy = dataCopy[keyParts[i]];
+        data_copy = data_copy[key_parts[i]];
     }
     
-    return { fullKey, dataCopy };
+    return { full_key, data_copy };
 }
 
 const search_variable_last_index = (html, index) => {
-    let lastIndex = index;
-    while(lastIndex < html.length || index !== -1) {
-        let char = html.charAt(lastIndex);
+    let last_index = index;
+    while(last_index < html.length || index !== -1) {
+        let char = html.charAt(last_index);
         if(char === '}') {
             break;
         }
-        lastIndex += 1;
+        last_index += 1;
     }
-    return lastIndex;
+    return last_index;
 }
 
 const apply_variables = (html, data, key) => {
     const regex = new RegExp(`\\$\\{${key}(\\.\\w+)*\\}`);
     let index = html.search(regex);
     while(index !== -1) {
-        const lastIndex = search_variable_last_index(html, index);
+        const last_index = search_variable_last_index(html, index);
+        const { full_key, data_copy } = serch_variable_value(html, data, index, last_index);
 
-        const { fullKey, dataCopy } = serch_variable_value(html, data, index, lastIndex);
-
-        html = html.replaceAll(`\${${fullKey}}`, dataCopy);
+        html = html.replaceAll(`\${${full_key}}`, data_copy);
 
         index = html.search(regex);
     }
